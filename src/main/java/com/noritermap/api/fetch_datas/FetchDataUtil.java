@@ -15,12 +15,42 @@ import java.util.Objects;
 @Component
 public class FetchDataUtil {
     private static final String FACILITIES_URL = "https://apis.data.go.kr/1741000/pfc2/pfc/getPfctInfo2";
+    private static final String GWANGJU_FACILITIES_URL =
+            "https://api.odcloud.kr/api/15012318/v1/uddi:134b939e-e07e-4c65-8f78-948e2a2c824d_202003271411";
     private static final String RIDES_URL = "https://apis.data.go.kr/1741000/ride3/getRide3";
 
     @Value("${secret-key.gdata}")
     private String AUTH_KEY;
 
     private WebClient webClient = WebClient.builder().build();
+
+    public JSONObject requestGetGwangJuFacilities(int pageIndex, int recordPerPage){
+        String uriString = String.format("%s?serviceKey=%s&page=%d&perPage=%d",
+                GWANGJU_FACILITIES_URL, AUTH_KEY, pageIndex, recordPerPage);
+
+        URI uri;
+        try {
+            uri = new URI(uriString);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Failed to build URI", e);
+        }
+
+        // 출력 URI 확인
+        System.out.println("Generated URI: " + uri.toString());
+
+        String responseString = webClient.get()
+                .uri(uri)
+                .header("Accept", "application/json, text/plain, */*")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        if (Objects.requireNonNull(responseString).isEmpty()) {
+            throw new RuntimeException("공공 데이터 서버와 연결에 실패하였습니다.");
+        }
+
+        return parseResponse(responseString);
+    }
 
     public JSONObject requestGetFacilities(int pageIndex, int recordPerPage){
         String uriString = String.format("%s?serviceKey=%s&pageIndex=%d&recordCountPerPage=%d",

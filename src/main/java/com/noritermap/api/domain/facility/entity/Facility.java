@@ -42,4 +42,10 @@ public class Facility {
     private String rgnCdNm;             // 지역분류코드명
     private String latCrtsVl;           // 경도
     private String lotCrtsVl;           // 위도
+
+    // 광주광역시
+    private String incld_water;         // 물놀이형 놀이시설
+    private String cctvCnt;                // cctv
+    private String insurance;           // 보험가입 여부
+    private String safetyInsp;          // 안전검사 여부
 }

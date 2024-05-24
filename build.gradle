@@ -49,6 +49,9 @@ dependencies {
 
 	// resolve dns error
 	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
+
+	// csv 파일 읽어오기
+	implementation 'com.opencsv:opencsv:5.5.2'
 }
 
 tasks.named('test') {

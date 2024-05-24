@@ -3,12 +3,14 @@ package com.noritermap.api.domain.facility.dto;
 import com.noritermap.api.domain.facility.entity.Facility;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 import org.json.simple.JSONObject;
 
 public class FacilityDto {
 
     @Data
     @Builder
+    @ToString
     public static class FacilityResponseDto{
         private String pfctSn;
         private String pfctNm;
@@ -38,6 +40,11 @@ public class FacilityDto {
         private String rgnCdNm;
         private String latCrtsVl;
         private String lotCrtsVl;
+
+        private String incld_water;         // 물놀이형 놀이시설
+        private String cctvCnt;                // cctv
+        private String insurance;           // 보험가입 여부
+        private String safetyInsp;          // 안전검사 여부
 
         public static FacilityResponseDto fromJsonObject(JSONObject item){
             return FacilityResponseDto.builder()
@@ -102,6 +109,10 @@ public class FacilityDto {
                     .rgnCdNm(this.rgnCdNm)
                     .latCrtsVl(this.latCrtsVl)
                     .lotCrtsVl(this.lotCrtsVl)
+                    .incld_water(this.incld_water)
+                    .cctvCnt(this.cctvCnt)
+                    .safetyInsp(this.safetyInsp)
+                    .insurance(this.insurance)
                     .build();
         }
     }
