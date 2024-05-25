@@ -158,4 +158,20 @@ public class FetchDataService {
 
         }
     }
+
+    @Transactional
+    public void fetchLatlot(String pfctSn, String lat, String lot) {
+        Optional<Facility> facilityOptional = facilityRepository.findByPfctSn(pfctSn);
+
+        if (facilityOptional.isPresent()){
+            Facility facilityPS = facilityOptional.get();
+
+            facilityPS.setLatCrtsVl(lat);
+            facilityPS.setLotCrtsVl(lot);
+
+            System.out.println(pfctSn);
+        }
+
+
+    }
 }
