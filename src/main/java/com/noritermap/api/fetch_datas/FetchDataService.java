@@ -1,5 +1,6 @@
 package com.noritermap.api.fetch_datas;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noritermap.api.domain.facility.entity.Facility;
 import com.noritermap.api.domain.facility.repository.FacilityRepository;
 import com.noritermap.api.domain.rides.dto.RidesDto;
@@ -14,12 +15,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -173,5 +176,47 @@ public class FetchDataService {
         }
 
 
+    }
+
+
+    public void extractData() {
+        List<Facility> all = facilityRepository.findAll();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // static 폴더 경로를 지정합니다.
+        String directoryPath = "src/main/resources/static";
+        File directory = new File(directoryPath);
+
+        for (int i = 0; i < all.size(); i += 100) {
+            // 범위를 벗어나지 않도록 서브리스트를 생성합니다.
+            int end = Math.min(i + 100, all.size());
+            System.out.print(i);
+            List<Facility> tmpList = all.subList(i, end);
+            List<FacilityLatLonDto> collect = tmpList.stream().map(FacilityLatLonDto::from).toList();
+
+            // JSON 파일에 저장할 데이터를 배열 형태로 변환합니다.
+            List<Object[]> dataToWrite = new ArrayList<>();
+            for (FacilityLatLonDto dto : collect) {
+                Object[] dataArray = {
+                        dto.getFacilityId(),
+                        dto.getLatitude(),
+                        dto.getLongitude(),
+                        dto.getFacilityName(),
+                        dto.getAddr()
+                };
+                dataToWrite.add(dataArray);
+            }
+
+            // 파일명을 지정합니다.
+            String fileName = directoryPath + "/facility_data_" + (i / 100 + 1) + ".json";
+            File file = new File(fileName);
+
+            // 데이터를 JSON 파일로 저장합니다.
+            try {
+                objectMapper.writeValue(file, dataToWrite);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
