@@ -28,4 +28,8 @@ public class FacilityService {
     public FacilityInfoDetailDto getFacilityInfoDetail(Long facilityId) {
         return facilityRepository.getInfoDetail(facilityId);
     }
+
+    public RatingAndReviewCntDto getRatingAndReviewCnt(Long facilityId) {
+        return facilityRepository.getRatingAndReviewCnt(facilityId);
+    }
 }

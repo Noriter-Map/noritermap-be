@@ -158,4 +158,24 @@ public class FacilityResponseDto {
             this.reviewCnt = reviewCnt;
         }
     }
+
+    @Schema(title = "오버레이에 담길 리뷰와 레이팅 DTO")
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    public static class RatingAndReviewCntDto {
+        @Schema(description = "놀이시설 ID", example = "1")
+        private Long facilityId;
+        @Schema(description = "평점", example = "4.5")
+        private Double rating;
+        @Schema(description = "총 리뷰 개수", example = "59")
+        private Long reviewCnt;
+
+        @QueryProjection
+        public RatingAndReviewCntDto(Long facilityId, Double rating, Long reviewCnt) {
+            this.facilityId = facilityId;
+            this.rating = rating;
+            this.reviewCnt = reviewCnt;
+        }
+    }
 }

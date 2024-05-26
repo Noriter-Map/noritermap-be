@@ -3,6 +3,7 @@ package com.noritermap.api.domain.facility.repository;
 import com.noritermap.api.domain.facility.dto.QFacilityResponseDto_FacilityInfoBaseDto;
 import com.noritermap.api.domain.facility.dto.QFacilityResponseDto_FacilityInfoDetailDto;
 import com.noritermap.api.domain.facility.dto.QFacilityResponseDto_FacilitySearchResultDto;
+import com.noritermap.api.domain.facility.dto.QFacilityResponseDto_RatingAndReviewCntDto;
 import com.noritermap.api.domain.facility.enumTypes.FacilityEnum;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
@@ -116,5 +117,15 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom{
                 .fetchOne();
     }
 
-
+    @Override
+    public RatingAndReviewCntDto getRatingAndReviewCnt(Long facilityId) {
+        return queryFactory
+                .select(new QFacilityResponseDto_RatingAndReviewCntDto(facility.id, review.rating.avg().coalesce(0.0), review.count().coalesce(0L)))
+                .from(facility)
+                .leftJoin(review)
+                .on(review.facility.eq(facility))
+                .where(facility.id.eq(facilityId))
+                .groupBy(facility)
+                .fetchOne();
+    }
 }

@@ -14,4 +14,5 @@ public interface FacilityRepositoryCustom {
     FacilityInfoBaseDto getInfoBase(Long facilityId);
 
     FacilityInfoDetailDto getInfoDetail(Long facilityId);
+    RatingAndReviewCntDto getRatingAndReviewCnt(Long facilityId);
 }

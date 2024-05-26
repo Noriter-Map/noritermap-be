@@ -44,10 +44,10 @@ public class Facility {
     private String rgnCdNm;             // 지역분류코드명
 
     @Setter
-    private String latCrtsVl;           // 경도
+    private String latCrtsVl;           // 위도
 
     @Setter
-    private String lotCrtsVl;           // 위도
+    private String lotCrtsVl;           // 경도
 
     // 광주광역시
     private String incld_water;         // 물놀이형 놀이시설
@@ -61,4 +61,6 @@ public class Facility {
 
     @OneToMany(mappedBy = "facility")
     private List<Review> reviews;
+
+    private Boolean modifiedLoc;
 }

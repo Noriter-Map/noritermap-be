@@ -101,4 +101,15 @@ public class FacilityController {
 
         return new ResponseEntity<>(new ResponseDto<>(1, results), HttpStatus.OK);
     }
+
+    @Operation(summary = "Overlay 에 들어갈 별점과 리뷰 데이터")
+    @GetMapping("/overlay/rating-and-review/{id}")
+    public ResponseEntity<ResponseDto<RatingAndReviewCntDto>> getRatingAndReviewCnt(
+            @Schema(description = "facility id", example = "1")
+            @PathVariable(value = "id") Long facilityId
+    ){
+        RatingAndReviewCntDto results = facilityService.getRatingAndReviewCnt(facilityId);
+
+        return new ResponseEntity<>(new ResponseDto<>(1, results), HttpStatus.OK);
+    }
 }
