@@ -12,15 +12,15 @@ import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -217,6 +217,102 @@ public class FetchDataService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Transactional
+    public void modifyLatlot(Integer index) {
+        Resource facilityFile = new ClassPathResource("static/todo/TO_MODIFY_FCT_" + index + ".txt");
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(facilityFile.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",\\s*");
+                if (parts.length == 3) {
+                    Long facility_id = Long.parseLong(parts[0].trim());
+                    String latCrtsVl = parts[1].trim();
+                    String lotCrtsVl = parts[2].trim();
+
+                    // 여기에 원하는 로직을 추가하세요
+                    Facility facility = facilityRepository.findById(facility_id)
+                            .orElseThrow(() -> new RuntimeException(facility_id + " 가 없음."));
+
+                    facility.setLatCrtsVl(latCrtsVl);
+                    facility.setLotCrtsVl(lotCrtsVl);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    public void addLatlot(Integer index) {
+        Resource facilityFile = new ClassPathResource("static/todo/TO_ADD_FCT_" + index + ".txt");
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(facilityFile.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",\\s*");
+                if (parts.length == 3) {
+                    Long facility_id = Long.parseLong(parts[0].trim());
+                    String latCrtsVl = parts[1].trim();
+                    String lotCrtsVl = parts[2].trim();
+
+                    // 여기에 원하는 로직을 추가하세요
+                    Facility facility = facilityRepository.findById(facility_id)
+                            .orElseThrow(() -> new RuntimeException(facility_id + " 가 없음."));
+
+                    facility.setLatCrtsVl(latCrtsVl);
+                    facility.setLotCrtsVl(lotCrtsVl);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void extractMarkerData() {
+        List<Facility> facilityList = facilityRepository.findAll();
+        JSONObject rootObject = new JSONObject();
+        JSONArray dataArray = new JSONArray();
+
+        for (Facility facility : facilityList) {
+            // --> 아직 id 500까지만
+            if (facility.getId() > 500) break;
+
+            JSONObject facilityObject = new JSONObject();
+            facilityObject.put("facility_id", facility.getId().toString());
+            facilityObject.put("lat", facility.getLatCrtsVl());
+            facilityObject.put("lot", facility.getLotCrtsVl());
+            facilityObject.put("pfct_nm", facility.getPfctNm());
+
+            if (Objects.isNull(facility.getRonaAddr()) || !StringUtils.hasText(facility.getRonaAddr())){
+                facilityObject.put("addr", facility.getLotnoAddr());
+            }else {
+                facilityObject.put("addr", facility.getRonaAddr());
+            }
+            facilityObject.put("instl_place_cd_nm", facility.getInstlPlaceCdNm());
+            facilityObject.put("zip", facility.getZip());
+
+            dataArray.add(facilityObject);
+        }
+
+        rootObject.put("data", dataArray);
+
+        try {
+            File directory = new File("src/main/resources/static/marker_data");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            File file = new File(directory, "marker_data.json");
+            try (FileWriter fileWriter = new FileWriter(file)) {
+                fileWriter.write(rootObject.toJSONString());
+                fileWriter.flush();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

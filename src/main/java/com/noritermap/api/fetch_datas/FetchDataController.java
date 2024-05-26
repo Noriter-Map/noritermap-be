@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "서버 내부 데이터 처리용 - 무시하세요", description = "")
@@ -60,4 +61,25 @@ public class FetchDataController {
 //
 //        return new ResponseEntity<>(HttpStatus.OK);
 //    }
+
+    @GetMapping("/modify-latlot")
+    public ResponseEntity<?> modifyLatlot(@RequestParam(name = "index") Integer index){
+        fetchDataService.modifyLatlot(index);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/add-latlot")
+    public ResponseEntity<?> addLatlot(@RequestParam(name = "index") Integer index){
+        fetchDataService.addLatlot(index);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/extract-marker-data")
+    public ResponseEntity<?> extractMarkerData(){
+        fetchDataService.extractMarkerData();
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
