@@ -1,6 +1,5 @@
 package com.noritermap.api.domain.facility.service;
 
-import com.noritermap.api.domain.facility.enumTypes.FacilityEnum;
 import com.noritermap.api.domain.facility.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,8 +17,8 @@ import static com.noritermap.api.domain.facility.dto.FacilityResponseDto.*;
 public class FacilityService {
     private final FacilityRepository facilityRepository;
 
-    public Page<FacilitySearchResultDto> search(String keyword, List<Boolean> isIndoor, List<FacilityEnum.Category> category, List<FacilityEnum.prvtPblc> prvtPblc, String latitude, String longitude, Pageable pageable) {
-        return facilityRepository.searchWithQueries(keyword, isIndoor, category, prvtPblc, latitude, longitude, pageable);
+    public Page<FacilitySearchResultDto> search(String keyword, List<String> idrodr, List<String> category, List<String> prvtPblc, String latitude, String longitude, Pageable pageable) {
+        return facilityRepository.searchWithQueries(keyword, idrodr, category, prvtPblc, latitude, longitude, pageable);
     }
 
     public FacilityInfoBaseDto getFacilityInfoBase(Long facilityId) {

@@ -1,11 +1,11 @@
 package com.noritermap.api.domain.facility.controller;
 
-import com.noritermap.api.domain.facility.enumTypes.FacilityEnum;
 import com.noritermap.api.domain.facility.service.FacilityService;
 import com.noritermap.api.domain.review.service.ReviewService;
 import com.noritermap.api.global.response.ResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -44,16 +44,18 @@ public class FacilityController {
             @Parameter(name = "keyword", description = "검색어", example = "근린")
             @RequestParam(value = "keyword", required = false) String keyword,
 
-            @Parameter(name = "indoor", description = "실내외, {true : 실내, false : 실외}\n\n 실내외 값이 없는 데이터가 간혹 있다. 나중에 응답 값 받을 떄 참고할 것.\n\n 둘 다면 true,false 로 보내면 됨", example = "false,true")
-            @RequestParam(value = "indoor", required = false) List<Boolean> isIndoor,
+            @Parameter(name = "idrodr", in = ParameterIn.QUERY,
+                    description = "실내외, {indoor : 실내, outdoor : 실외}\n\n 실내외 값이 없는 데이터가 간혹 있다. 나중에 응답 값 받을 떄 참고할 것.\n\n 둘 다면 indoor,outdoor 로 보내면 됨",
+                    schema = @Schema(type="string", example = "indoor,outdoor"))
+            @RequestParam(value = "idrodr", required = false) List<String> idrodr,
 
             @Parameter(name = "category", description = "설치장소\n\n " +
                     "{C1: 주택단지, C2: 도시공원, C3: 어린이집, C4: 놀이제공영업소, C5: 식품접객업소, C6: 주상복합, C7: 아동복지시설, C8: 종교시설, C9: 대규모점포, C10: 육아종합지원센터, C11: 박물관, C12: 야영장, C13: 기타}",
-                    example = "C1,C2,C3,C11")
-            @RequestParam(value = "category", required = false) List<FacilityEnum.Category> category,
+                    schema = @Schema(type="string", example = "C1,C3,C7"))
+            @RequestParam(value = "category", required = false) List<String> category,
 
-            @Parameter(name = "prvt_pblc", description = "민공구분", example = "public,private")
-            @RequestParam(value = "prvt_pblc", required = false) List<FacilityEnum.prvtPblc> prvtPblc,
+            @Parameter(name = "prvt_pblc", description = "민공구분", schema = @Schema(type="string", example = "public,private"))
+            @RequestParam(value = "prvt_pblc", required = false) List<String> prvtPblc,
 
             @Parameter(name = "curLatitude", description = "현재 위도", example = "37.234312")
             @RequestParam(value = "curLatitude", required = false) String latitude,
@@ -62,7 +64,7 @@ public class FacilityController {
             @RequestParam(value = "curLongitude", required = false) String longitude,
             Pageable pageable
     ){
-        Page<FacilitySearchResultDto> results = facilityService.search(keyword, isIndoor, category, prvtPblc, latitude, longitude, pageable);
+        Page<FacilitySearchResultDto> results = facilityService.search(keyword, idrodr, category, prvtPblc, latitude, longitude, pageable);
 
         return new ResponseEntity<>(new ResponseDto<>(1, results), HttpStatus.OK);
     }

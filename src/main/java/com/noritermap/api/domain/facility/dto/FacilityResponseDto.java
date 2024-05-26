@@ -49,7 +49,7 @@ public class FacilityResponseDto {
             this.prvtPblcYnCdNm = prvtPblcYnCdNm;
 
             if (!hasText(idrodrCdNm)){
-                this.idrodrCdNm = FacilityEnum.Indoor.UNDEFINED.getValue();
+                this.idrodrCdNm = FacilityEnum.Idrodr.UNDEFINED.getValue();
             }else {
                 this.idrodrCdNm = idrodrCdNm;
             }

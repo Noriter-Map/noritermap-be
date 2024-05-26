@@ -7,7 +7,7 @@ public class FacilityEnum {
 
     @Getter
     @RequiredArgsConstructor
-    public enum Indoor{
+    public enum Idrodr{
         INDOOR("실내"),
         OUTDOOR("실외"),
         UNDEFINED("undefined"),

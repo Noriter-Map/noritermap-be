@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.noritermap.api.domain.facility.dto.FacilityResponseDto.*;
 import static com.noritermap.api.domain.facility.entity.QFacility.*;
@@ -29,7 +30,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom{
     private static final Double GWANGJU_CITY_HALL_LONGITUDE = 126.851309;
 
     @Override
-    public Page<FacilitySearchResultDto> searchWithQueries(String keyword, List<Boolean> isIndoor, List<FacilityEnum.Category> category, List<FacilityEnum.prvtPblc> prvtPblc, String latitudeString, String longitudeString, Pageable pageable) {
+    public Page<FacilitySearchResultDto> searchWithQueries(String keyword, List<String> idrodr, List<String> category, List<String> prvtPblc, String latitudeString, String longitudeString, Pageable pageable) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         Double latitude; Double longitude;
 
@@ -37,24 +38,24 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom{
             booleanBuilder.and(facility.pfctNm.contains(keyword));
         }
 
-        if (!isIndoor.isEmpty()){
-            List<String> conditions = isIndoor.stream()
-                    .map(b -> b ? FacilityEnum.Indoor.INDOOR.getValue() : FacilityEnum.Indoor.OUTDOOR.getValue()).toList();
+        if (Objects.nonNull(idrodr) && !idrodr.isEmpty()){
+            List<String> conditions = idrodr.stream()
+                            .map(str -> FacilityEnum.Idrodr.valueOf(str.toUpperCase()).getValue()).toList();
 
             booleanBuilder.and(facility.idrodrCdNm.in(conditions));
 
         }
 
-        if (!category.isEmpty()){
+        if (Objects.nonNull(category) && !category.isEmpty()){
             List<String> conditions = category.stream()
-                    .map(FacilityEnum.Category::getValue).toList();
+                    .map(str -> FacilityEnum.Category.valueOf(str.toUpperCase()).getValue()).toList();
 
             booleanBuilder.and(facility.instlPlaceCdNm.in(conditions));
         }
 
-        if (!prvtPblc.isEmpty()){
+        if (Objects.nonNull(prvtPblc) && !prvtPblc.isEmpty()){
             List<String> conditions = prvtPblc.stream()
-                    .map(FacilityEnum.prvtPblc::getValue).toList();
+                    .map(str -> FacilityEnum.prvtPblc.valueOf(str.toUpperCase()).getValue()).toList();
 
             booleanBuilder.and(facility.prvtPblcYnCdNm.in(conditions));
         }
@@ -114,4 +115,6 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom{
                 .where(facility.id.eq(facilityId))
                 .fetchOne();
     }
+
+
 }
