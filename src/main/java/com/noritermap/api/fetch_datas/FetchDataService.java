@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noritermap.api.domain.facility.entity.Facility;
 import com.noritermap.api.domain.facility.repository.FacilityRepository;
 import com.noritermap.api.domain.rides.dto.RidesDto;
+import com.noritermap.api.domain.rides.entity.NationwideRides;
+import com.noritermap.api.domain.rides.repository.NationwideRepository;
 import com.noritermap.api.domain.rides.repository.RidesRepository;
 import com.noritermap.api.domain.facility.dto.FacilityDto;
 import com.opencsv.CSVReader;
@@ -31,6 +33,7 @@ public class FetchDataService {
     private final FacilityRepository facilityRepository;
     private final RidesRepository ridesRepository;
     private final FetchDataUtil fetchDataUtil;
+    private final NationwideRepository nationwideRepository;
 
     @Transactional
     public void fetchFacilitiesData(){
@@ -314,5 +317,20 @@ public class FetchDataService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Transactional
+    public void extractOnlyGjRides() {
+        List<Facility> facilityList = facilityRepository.findAll();
+
+        facilityList.forEach(facility -> {
+                    String pfctNm = facility.getPfctNm();
+                    List<NationwideRides> nationwideRides = nationwideRepository.findByPfctNm(pfctNm);
+
+                    nationwideRides.forEach(nr -> {
+                        ridesRepository.save(nr.toRides());
+                    });
+                    System.out.print(facility.getId());
+                });
     }
 }
