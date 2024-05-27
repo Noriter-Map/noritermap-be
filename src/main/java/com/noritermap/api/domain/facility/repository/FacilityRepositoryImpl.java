@@ -1,9 +1,6 @@
 package com.noritermap.api.domain.facility.repository;
 
-import com.noritermap.api.domain.facility.dto.QFacilityResponseDto_FacilityInfoBaseDto;
-import com.noritermap.api.domain.facility.dto.QFacilityResponseDto_FacilityInfoDetailDto;
-import com.noritermap.api.domain.facility.dto.QFacilityResponseDto_FacilitySearchResultDto;
-import com.noritermap.api.domain.facility.dto.QFacilityResponseDto_RatingAndReviewCntDto;
+import com.noritermap.api.domain.facility.dto.*;
 import com.noritermap.api.domain.facility.enumTypes.FacilityEnum;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
@@ -22,6 +19,7 @@ import java.util.Objects;
 import static com.noritermap.api.domain.facility.dto.FacilityResponseDto.*;
 import static com.noritermap.api.domain.facility.entity.QFacility.*;
 import static com.noritermap.api.domain.review.entity.QReview.*;
+import static com.noritermap.api.domain.rides.entity.QRides.rides;
 import static org.springframework.util.StringUtils.*;
 
 @RequiredArgsConstructor
@@ -110,11 +108,26 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom{
 
     @Override
     public FacilityInfoDetailDto getInfoDetail(Long facilityId) {
-        return queryFactory
-                .select(new QFacilityResponseDto_FacilityInfoDetailDto(facility.id, facility.pfctSn, facility.pfctNm, facility.zip, facility.ronaAddr, facility.lotnoAddr, facility.instlYmd, facility.instlPlaceCdNm, facility.prvtPblcYnCdNm, facility.idrodrCdNm, facility.latCrtsVl, facility.lotCrtsVl, facility.incld_water, facility.cctvCnt, facility.insurance, facility.safetyInsp))
+        List<FacilityInfoDetailDto.RidesInfoDto> ridesList = queryFactory
+                .select(new QFacilityResponseDto_FacilityInfoDetailDto_RidesInfoDto(rides.pfctNm, rides.rideInstlYmd, rides.rideStylCdNm))
+                .from(rides)
+                .where(rides.pfctSn.eq(facility.pfctNm))
+                .fetch();
+
+        FacilityInfoDetailDto result = queryFactory
+                .select(new QFacilityResponseDto_FacilityInfoDetailDto(
+                        facility.id, facility.pfctSn, facility.pfctNm, facility.zip, facility.ronaAddr, facility.lotnoAddr,
+                        facility.instlYmd, facility.instlPlaceCdNm, facility.prvtPblcYnCdNm, facility.idrodrCdNm,
+                        facility.latCrtsVl, facility.lotCrtsVl, facility.incld_water, facility.cctvCnt, facility.insurance,
+                        facility.safetyInsp))
                 .from(facility)
                 .where(facility.id.eq(facilityId))
                 .fetchOne();
+
+        Objects.requireNonNull(result).setRides(ridesList);
+
+        return result;
+
     }
 
     @Override

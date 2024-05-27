@@ -5,6 +5,8 @@ import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.util.List;
+
 import static org.springframework.util.StringUtils.*;
 
 public class FacilityResponseDto {
@@ -70,7 +72,7 @@ public class FacilityResponseDto {
         private Long facilityId;
         @Schema(description = "놀이시설 일련번호", example = "42141")
         private String pfctSn;
-        @Schema(description = "놀이시설명", example = "월곡근린공원 놀이터")
+        @Schema(description = "놀이시설명", example = "쌍학공원")
         private String pfctNm;
         @Schema(description = "우편번호", example = "07027")
         private String zip;
@@ -98,6 +100,10 @@ public class FacilityResponseDto {
         private String insurance;
         @Schema(description = "안전검사 여부", example = "미검사|검사완료")
         private String safetyInsp;
+
+        @Schema(description = "시설 내 놀이기구")
+        @Setter
+        private List<RidesInfoDto> rides;
 
 
         @QueryProjection
@@ -129,9 +135,31 @@ public class FacilityResponseDto {
             this.insurance = insurance;
             this.safetyInsp = safetyInsp;
         }
+
+        @Schema(title = "놀이시설 내 놀이기구들 정보 (Base) DTO")
+        @Getter
+        @NoArgsConstructor
+        public static class RidesInfoDto {
+            @Schema(description = "놀이시설명 - 크로스체크용", example = "쌍학공원")
+            private String pfctNm;
+            @Schema(description = "설치일자", example = "20090301")
+            private String rideInstlYmd;
+            @Schema(description = "놀이기구 유형", example = "그네")
+            private String rideStylCdNm;
+
+            @QueryProjection
+            public RidesInfoDto(String pfctNm, String rideInstlYmd, String rideStylCdNm) {
+                this.pfctNm = pfctNm;
+                this.rideInstlYmd = rideInstlYmd;
+                this.rideStylCdNm = rideStylCdNm;
+            }
+        }
     }
 
-    @Schema(title = "놀이시설 정보 (Base) DTO")
+
+
+
+    @Schema(title = "놀이시설 내 놀이기구 정보 (Base) DTO")
     @Getter
     @NoArgsConstructor
     public static class FacilityInfoBaseDto {
