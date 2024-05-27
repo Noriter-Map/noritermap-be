@@ -50,7 +50,7 @@ public class FetchDataService {
     private final JPAQueryFactory queryFactory;
 
     @Value("${secret-key.kakao-location}")
-    private final String REST_API_KEY;
+    private String REST_API_KEY;
     private static final String URL = "https://dapi.kakao.com/v2/local/search/address.json";
 
     @Transactional
