@@ -159,7 +159,7 @@ public class FacilityResponseDto {
 
 
 
-    @Schema(title = "놀이시설 내 놀이기구 정보 (Base) DTO")
+    @Schema(title = "놀이시설 정보 (Base) DTO")
     @Getter
     @NoArgsConstructor
     public static class FacilityInfoBaseDto {
