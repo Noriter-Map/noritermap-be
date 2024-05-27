@@ -52,12 +52,12 @@ public class FetchDataController {
 //        return new ResponseEntity<>(HttpStatus.OK);
 //    }
 
-//    @GetMapping("/extract-latlot-data")
-//    public ResponseEntity<?> extractData(){
-//        fetchDataService.extractData();
-//
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
+    @GetMapping("/extract-latlot-data")
+    public ResponseEntity<?> extractData(){
+        fetchDataService.extractData();
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @GetMapping("/modify-latlot")
     public ResponseEntity<?> modifyLatlot(@RequestParam(name = "index") Integer index){
@@ -80,9 +80,16 @@ public class FetchDataController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @PostMapping("/extract-rides-from-nationwide-to-gj")
-//    public ResponseEntity<?> extractOnlyGjRides(){
-//        fetchDataService.extractOnlyGjRides();
+//    @GetMapping("/fill-ronaaddr-from-lotnoaddr")
+//    public ResponseEntity<?> fillRonaAddr(){
+//        fetchDataService.fillRonaAddr();
+//
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
+
+//    @GetMapping("/fill-mock-latlot")
+//    public ResponseEntity<?> fillMockLatlot(){
+//        fetchDataService.fillMockLatLot();
 //
 //        return new ResponseEntity<>(HttpStatus.OK);
 //    }

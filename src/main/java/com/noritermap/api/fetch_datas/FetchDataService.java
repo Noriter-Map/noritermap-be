@@ -2,6 +2,7 @@ package com.noritermap.api.fetch_datas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noritermap.api.domain.facility.entity.Facility;
+import com.noritermap.api.domain.facility.entity.QFacility;
 import com.noritermap.api.domain.facility.repository.FacilityRepository;
 import com.noritermap.api.domain.rides.dto.RidesDto;
 import com.noritermap.api.domain.rides.entity.NationwideRides;
@@ -10,14 +11,23 @@ import com.noritermap.api.domain.rides.repository.RidesRepository;
 import com.noritermap.api.domain.facility.dto.FacilityDto;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -26,14 +36,22 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.noritermap.api.domain.facility.entity.QFacility.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class FetchDataService {
     private final FacilityRepository facilityRepository;
+    private final FacilityFetchRepository facilityFetchRepository;
     private final RidesRepository ridesRepository;
     private final FetchDataUtil fetchDataUtil;
     private final NationwideRepository nationwideRepository;
+    private final JPAQueryFactory queryFactory;
+
+    @Value("${secret-key.kakao-location}")
+    private final String REST_API_KEY;
+    private static final String URL = "https://dapi.kakao.com/v2/local/search/address.json";
 
     @Transactional
     public void fetchFacilitiesData(){
@@ -83,50 +101,51 @@ public class FetchDataService {
         }
     }
 
-//    @Transactional
-//    public void readFacilitiesFromCsv() {
-//        try {
-//            ClassPathResource resource = new ClassPathResource("static/광주광역시_어린이_놀이시설_현황_20240216.csv");
-//            Reader reader = new FileReader(resource.getFile());
-//            CSVReader csvReader = new CSVReader(reader);
-//            String[] line;
-//            boolean isFirstLine = true;
-//
-//            while ((line = csvReader.readNext()) != null) {
-//                if (isFirstLine) {
-//                    isFirstLine = false; // skip header
-//                    continue;
-//                }
-//
-//                String pfctSn = line[0];
-//                String idrodrCdNm = line[6];
-//
-//                Optional<Facility> facilityOptional = facilityRepository.findByPfctSn(pfctSn);
-//
+    @Transactional
+    public void readFacilitiesFromCsv() {
+        try {
+            ClassPathResource resource = new ClassPathResource("static/광주광역시_어린이_놀이시설_현황_20240216.csv");
+            Reader reader = new FileReader(resource.getFile());
+            CSVReader csvReader = new CSVReader(reader);
+            String[] line;
+            boolean isFirstLine = true;
+
+            while ((line = csvReader.readNext()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false; // skip header
+                    continue;
+                }
+
+                String pfctSn = line[0];
+                String idrodrCdNm = line[6];
+
+                Optional<Facility> facilityOptional = facilityRepository.findByPfctSn(pfctSn);
+
+                // Facility 클래스에 @Setter 제거함.
 //                facilityOptional.ifPresent(facility -> facility.setIdrodrCdNm(idrodrCdNm));
-//
-//                if (facilityOptional.isEmpty()){
-//                    Facility facility = Facility.builder()
-//                            .pfctSn(line[0])
-//                            .pfctNm(line[1])
-//                            .ronaAddr(line[2])
-//                            .instlYmd(line[3])
-//                            .instlPlaceCdNm(line[4])
-//                            .prvtPblcYnCdNm(line[5])
-//                            .idrodrCdNm(line[6])
-//                            .incld_water(line[7])
-//                            .build();
-//
-//                    facilityRepository.save(facility);
-//                }
-//
-//            }
-//
-//            csvReader.close();
-//        } catch (IOException | CsvValidationException e) {
-//            e.printStackTrace();
-//        }
-//    }
+
+                if (facilityOptional.isEmpty()){
+                    Facility facility = Facility.builder()
+                            .pfctSn(line[0])
+                            .pfctNm(line[1])
+                            .ronaAddr(line[2])
+                            .instlYmd(line[3])
+                            .instlPlaceCdNm(line[4])
+                            .prvtPblcYnCdNm(line[5])
+                            .idrodrCdNm(line[6])
+                            .incld_water(line[7])
+                            .build();
+
+                    facilityRepository.save(facility);
+                }
+
+            }
+
+            csvReader.close();
+        } catch (IOException | CsvValidationException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Transactional
     public void fetchGwangjuFacilitiesData() {
@@ -282,7 +301,7 @@ public class FetchDataService {
 
         for (Facility facility : facilityList) {
             // --> 아직 id 500까지만
-            if (facility.getId() > 500) break;
+            if (facility.getId() > 1000) break;
 
             JSONObject facilityObject = new JSONObject();
             facilityObject.put("facility_id", facility.getId().toString());
@@ -333,4 +352,70 @@ public class FetchDataService {
                     System.out.print(facility.getId());
                 });
     }
+
+    @Transactional
+    public void fillRonaAddr() {
+        List<Facility> facilities = queryFactory
+                .selectFrom(facility)
+                .where(facility.ronaAddr.eq(""))
+                .fetch();
+
+        facilities.forEach(f -> {
+            // Facility 클래스에 @Setter 제거함.
+//            f.setRonaAddr(f.getLotnoAddr());
+        });
+    }
+
+    @Transactional
+    public void fillMockLatLot() {
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+
+        List<Facility> facilities = queryFactory.selectFrom(facility)
+                .where(facility.latCrtsVl.isNull().or(facility.latCrtsVl.eq("")))
+                .fetch();
+
+        facilities.forEach(f -> {
+            String location = f.getRonaAddr();
+
+            headers.set("Authorization", "KakaoAK " + REST_API_KEY);
+
+            // Setting parameters
+            String queryParams = "?query=" + location;
+
+            // Creating the entity
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            // Sending GET request
+            ResponseEntity<String> response = restTemplate.exchange(URL + queryParams, HttpMethod.GET, entity, String.class);
+
+            // Parsing the JSON response
+            String responseBody = response.getBody();
+            JSONParser parser = new JSONParser();
+            try {
+                JSONObject jsonObject = (JSONObject) parser.parse(responseBody);
+                JSONArray documents = (JSONArray) jsonObject.get("documents");
+
+                // Extracting and printing x, y values
+                if (!documents.isEmpty()){
+                    Object obj = documents.get(0);
+                    JSONObject doc = (JSONObject) obj;
+                    String longitude = (String) doc.get("x");
+                    String latitude = (String) doc.get("y");
+
+                    f.setLatCrtsVl(latitude);
+                    f.setLotCrtsVl(longitude);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+        });
+
+
+
+    }
+
 }
