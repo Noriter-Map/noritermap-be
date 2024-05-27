@@ -99,7 +99,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom{
     @Override
     public FacilityInfoBaseDto getInfoBase(Long facilityId) {
         return queryFactory
-                .select(new QFacilityResponseDto_FacilityInfoBaseDto(facility.id, facility.pfctNm, facility.exfcYn, facility.instlPlaceCdNm, review.rating.avg().coalesce(0.0), review.count().coalesce(0L)))
+                .select(new QFacilityResponseDto_FacilityInfoBaseDto(facility.id, facility.pfctNm, facility.exfcYn, facility.instlPlaceCdNm, review.rating.avg().coalesce(0.0), review.count().coalesce(0L), facility.latCrtsVl, facility.lotCrtsVl))
                 .from(facility)
                 .leftJoin(review)
                 .on(review.facility.eq(facility))

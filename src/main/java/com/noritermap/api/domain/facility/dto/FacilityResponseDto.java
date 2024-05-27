@@ -148,14 +148,21 @@ public class FacilityResponseDto {
         @Schema(description = "총 리뷰 개수", example = "59")
         private Long reviewCnt;
 
+        @Schema(description = "위도", example = "37.715133")
+        private String latCrtsVl;
+        @Schema(description = "경도", example = "127.269311")
+        private String lotCrtsVl;
+
         @QueryProjection
-        public FacilityInfoBaseDto(Long facilityId, String pfctNm, String exfcYn, String instlPlaceCdNm, Double rating, Long reviewCnt) {
+        public FacilityInfoBaseDto(Long facilityId, String pfctNm, String exfcYn, String instlPlaceCdNm, Double rating, Long reviewCnt, String latCrtsVl, String lotCrtsVl) {
             this.facilityId = facilityId;
             this.pfctNm = pfctNm;
             this.exfcYn = exfcYn;
             this.instlPlaceCdNm = instlPlaceCdNm;
             this.rating = rating;
             this.reviewCnt = reviewCnt;
+            this.latCrtsVl = latCrtsVl;
+            this.lotCrtsVl = lotCrtsVl;
         }
     }
 
