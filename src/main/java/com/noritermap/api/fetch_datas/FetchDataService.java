@@ -13,6 +13,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,10 +38,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.noritermap.api.domain.facility.entity.QFacility.*;
+import static com.noritermap.api.domain.facility.entity.QFacility.facility;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class FetchDataService {
     private final FacilityRepository facilityRepository;
     private final FacilityFetchRepository facilityFetchRepository;
@@ -256,11 +259,16 @@ public class FetchDataService {
                     String lotCrtsVl = parts[2].trim();
 
                     // 여기에 원하는 로직을 추가하세요
-                    Facility facility = facilityRepository.findById(facility_id)
-                            .orElseThrow(() -> new RuntimeException(facility_id + " 가 없음."));
+                    Optional<Facility> facilityOptional = facilityRepository.findById(facility_id);
 
-                    facility.setLatCrtsVl(latCrtsVl);
-                    facility.setLotCrtsVl(lotCrtsVl);
+                    if (facilityOptional.isPresent()){
+                        Facility facility = facilityOptional.get();
+
+                        facility.setLatCrtsVl(latCrtsVl);
+                        facility.setLotCrtsVl(lotCrtsVl);
+                    }else{
+                        log.info("{} 가 존재하지 않음", facility_id);
+                    }
                 }
             }
         } catch (IOException e) {
