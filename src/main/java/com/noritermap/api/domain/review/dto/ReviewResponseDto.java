@@ -36,9 +36,11 @@ public class ReviewResponseDto {
     public static class ReviewListResponseDto {
 
         @Schema(description = "평균 별점", example = "4.43")
-        Double ratingAvg;
+        @Builder.Default
+        Double ratingAvg = 0.0;
         @Schema(description = "총 리뷰 개수", example = "54")
-        Long reviewCnt;
+        @Builder.Default
+        Long reviewCnt = 0L;
         @Schema(description = "AI 리뷰 요약", example = "그냥 문자열 (최대 500자)")
         String aiSummary;
 

@@ -32,7 +32,12 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom{
                 .groupBy(review.facility)
                 .fetchOne();
 
-        Objects.requireNonNull(responseDto).setReviews(reviewDetailDtoList);
+        if (Objects.equals(responseDto, null)){
+            responseDto = ReviewListResponseDto.builder().build();
+            responseDto.setReviews(reviewDetailDtoList);
+        }else{
+            Objects.requireNonNull(responseDto).setReviews(reviewDetailDtoList);
+        }
 
         return responseDto;
 
