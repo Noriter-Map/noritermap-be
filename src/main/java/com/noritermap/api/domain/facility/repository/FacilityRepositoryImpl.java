@@ -108,12 +108,6 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom{
 
     @Override
     public FacilityInfoDetailDto getInfoDetail(Long facilityId) {
-        List<FacilityInfoDetailDto.RidesInfoDto> ridesList = queryFactory
-                .select(new QFacilityResponseDto_FacilityInfoDetailDto_RidesInfoDto(rides.pfctNm, rides.rideInstlYmd, rides.rideStylCdNm))
-                .from(rides)
-                .where(rides.pfctSn.eq(facility.pfctNm))
-                .fetch();
-
         FacilityInfoDetailDto result = queryFactory
                 .select(new QFacilityResponseDto_FacilityInfoDetailDto(
                         facility.id, facility.pfctSn, facility.pfctNm, facility.zip, facility.ronaAddr, facility.lotnoAddr,
@@ -123,6 +117,12 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom{
                 .from(facility)
                 .where(facility.id.eq(facilityId))
                 .fetchOne();
+
+        List<FacilityInfoDetailDto.RidesInfoDto> ridesList = queryFactory
+                .select(new QFacilityResponseDto_FacilityInfoDetailDto_RidesInfoDto(rides.pfctNm, rides.rideInstlYmd, rides.rideStylCdNm))
+                .from(rides)
+                .where(rides.pfctSn.eq(Objects.requireNonNull(result).getPfctSn()))
+                .fetch();
 
         Objects.requireNonNull(result).setRides(ridesList);
 
