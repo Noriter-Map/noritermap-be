@@ -308,9 +308,6 @@ public class FetchDataService {
         JSONArray dataArray = new JSONArray();
 
         for (Facility facility : facilityList) {
-            // --> 아직 id 500까지만
-            if (facility.getId() > 1000) break;
-
             JSONObject facilityObject = new JSONObject();
             facilityObject.put("facility_id", facility.getId().toString());
             facilityObject.put("lat", facility.getLatCrtsVl());
