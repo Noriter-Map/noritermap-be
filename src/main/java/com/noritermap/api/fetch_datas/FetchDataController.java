@@ -16,7 +16,7 @@ import java.util.Objects;
 public class FetchDataController {
 
     @Value("${secret-key.local-password}")
-    private final String PASSWORD;
+    private String PASSWORD;
 
     private final FetchDataService fetchDataService;
 
