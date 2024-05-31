@@ -55,7 +55,10 @@ dependencies {
 	// csv 파일 읽어오기
 	implementation 'com.opencsv:opencsv:5.5.2'
 
-	// cache
+	// slack
+	implementation 'com.slack.api:bolt:1.36.1'
+	implementation 'com.slack.api:bolt-servlet:1.36.1'
+	implementation 'com.slack.api:bolt-jetty:1.36.1'
 }
 
 tasks.named('test') {

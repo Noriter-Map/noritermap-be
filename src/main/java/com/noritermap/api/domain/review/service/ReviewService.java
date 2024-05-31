@@ -21,10 +21,10 @@ public class ReviewService {
     private final ReviewSummaryRepository reviewSummaryRepository;
 
     @Transactional
-    public void postReview(ReviewPostRequestDto requestDto) {
+    public Review postReview(ReviewPostRequestDto requestDto) {
         Review review = requestDto.toEntity().setFacility(facilityRepository.getReferenceById(requestDto.getFacilityId()));
 
-        reviewRepository.save(review);
+        return reviewRepository.save(review);
     }
 
     public ReviewListResponseDto getReviewList(Long facilityId) {
