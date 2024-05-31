@@ -29,21 +29,8 @@ public class SlackUtil {
                     .build();
 
             methods.chatPostMessage(request);
-            System.out.println(request.getChannel());
-            System.out.println(request.getText());
         }catch (SlackApiException | IOException e) {
             log.error(e.getMessage());
         }
-    }
-
-    public void sendReviewRegisteredSlackMessage(Long facilityId, String pfctNm, String nickname, Double rating, String content){
-        String message = String.format(
-                "facility_id : %s\n" +
-                "시설 이름 : %s\n" +
-                "닉네임 : %s\n" +
-                "별점 : %s\n" +
-                "내용 : %s\n"
-                , facilityId+"", pfctNm, nickname, rating+"", content);
-        this.sendSlackMessage(message, "#알림-리뷰중대");
     }
 }

@@ -1,5 +1,6 @@
 package com.noritermap.api.global.slack;
 
+import com.noritermap.api.domain.facility.dto.FacilityResponseDto;
 import com.noritermap.api.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -18,7 +19,26 @@ public class SlackAspect {
             returning = "review"
     )
     public void afterRegisterReview(Review review){
-        slackUtil.sendReviewRegisteredSlackMessage(review.getFacility().getId(), review.getFacility().getPfctNm(), review.getNickname(), review.getRating(), review.getContent());
+        String message = String.format(
+                "facility_id : %s\n" +
+                        "시설 이름 : %s\n" +
+                        "닉네임 : %s\n" +
+                        "별점 : %s\n" +
+                        "내용 : %s\n"
+                , review.getFacility().getId()+"", review.getFacility().getPfctNm(), review.getNickname(), review.getRating()+"", review.getContent());
+
+        slackUtil.sendSlackMessage(message, "#알림-리뷰중대");
+    }
+
+    // 시설 상세정도 조회
+    @AfterReturning(
+            pointcut = "execution(* com.noritermap.api.domain.facility.service.FacilityService.getFacilityInfoBase(Long))",
+            returning = "result"
+    )
+    public void afterGetFacilityInfoBase(FacilityResponseDto.FacilityInfoBaseDto result){
+        String message = String.format("facility id : %s, 시설 이름 : %s", result.getFacilityId(), result.getPfctNm());
+
+        slackUtil.sendSlackMessage(message, "#알림-상세정보조회");
     }
 
 }
