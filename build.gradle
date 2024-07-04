@@ -24,6 +24,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -59,6 +60,9 @@ dependencies {
 	implementation 'com.slack.api:bolt:1.36.1'
 	implementation 'com.slack.api:bolt-servlet:1.36.1'
 	implementation 'com.slack.api:bolt-jetty:1.36.1'
+
+	// MQ
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 tasks.named('test') {
