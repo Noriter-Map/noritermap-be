@@ -9,11 +9,10 @@
     </appender>
 
     <!-- Logstash -->
-    <springProperty name="LOGBACK_PROTOCOL" source="logstash.destination.protocol"/>
     <springProperty name="LOGBACK_URL" source="logstash.destination.url"/>
     <springProperty name="LOGBACK_PORT" source="logstash.destination.port"/>
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${LOGBACK_PROTOCOL}:${LOGBACK_URL}:${LOGBACK_PORT}</destination>
+        <destination>${LOGBACK_URL}:${LOGBACK_PORT}</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>{"appname":"appname"}</customFields>
         </encoder>
