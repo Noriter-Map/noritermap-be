@@ -94,6 +94,13 @@ public class FetchDataController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/500-error")
+    public ResponseEntity<?> trigger500(@RequestParam("password") String password){
+        if (!Objects.equals(password, PASSWORD)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 //    @GetMapping("/fill-ronaaddr-from-lotnoaddr")
 //    public ResponseEntity<?> fillRonaAddr(){
 //        fetchDataService.fillRonaAddr();
