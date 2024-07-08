@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import static com.noritermap.api.domain.review.dto.ReviewResponseDto.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/gj/v1/facility")
+@Slf4j
 public class FacilityController {
     private final FacilityService facilityService;
     private final ReviewService reviewService;
@@ -66,6 +68,7 @@ public class FacilityController {
     ){
         Page<FacilitySearchResultDto> results = facilityService.search(keyword, idrodr, category, prvtPblc, latitude, longitude, pageable);
 
+        log.info("검색 키워드 : {}", keyword);
         return new ResponseEntity<>(new ResponseDto<>(1, results), HttpStatus.OK);
     }
 
@@ -77,6 +80,7 @@ public class FacilityController {
     ){
         FacilityInfoBaseDto results = facilityService.getFacilityInfoBase(facilityId);
 
+        log.info("상세정보 조회 : {}", facilityId);
         return new ResponseEntity<>(new ResponseDto<>(1, results), HttpStatus.OK);
     }
 

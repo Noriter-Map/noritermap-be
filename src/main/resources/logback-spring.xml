@@ -10,7 +10,7 @@
 
     <!-- Logstash -->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${logstash.destination}</destination>
+        <destination>https://noritermap-1146715477.ap-northeast-2.elb.amazonaws.com:5000</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>{"appname":"appname"}</customFields>
         </encoder>
