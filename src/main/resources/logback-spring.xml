@@ -9,8 +9,10 @@
     </appender>
 
     <!-- Logstash -->
+    <springProperty name="LOGBACK_URL" source="logback.destination.url"/>
+    <springProperty name="LOGBACK_PORT" source="logback.destination.port"/>
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>https://noritermap-1146715477.ap-northeast-2.elb.amazonaws.com:5000</destination>
+        <destination>${LOGBACK_URL}:${LOGBACK_PORT}</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>{"appname":"appname"}</customFields>
         </encoder>
